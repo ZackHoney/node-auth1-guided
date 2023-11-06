@@ -31,8 +31,20 @@ router.post('/login', async (req, res, next) => {
     }
 })
 
-router.get('/logout', async (req, res, next) => {
-    res.json({ message: 'logout working' })
+router.get('/logout', async (req, res, next) => {//eslint-disable-line
+    if (req.session.user) {
+        const { username } = req.session.user
+        req.session.destroy(err => {
+            if (err) {
+                res.json({ message: `You can never leave, ${username}`})
+            } else {
+                res.set('Set-Cookie', 'monkey=; SameSite=Strict; Path=/; Expires=Thu, 01 Jan 1970 00:00:00')
+                res.json({ message: `Goodbye ${username}`})
+            }
+        })
+    } else {
+        res.json({ message: 'Sorry, have we met?'})
+    } 
 })
 
 module.exports = router;
